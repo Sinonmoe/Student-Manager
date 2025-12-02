@@ -12,6 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.StudentManager"
         tools:targetApi="31">
+
+        <!-- 1. Màn hình chính (Danh sách sinh viên) -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -20,6 +22,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 2. Màn hình Thêm sinh viên -->
+        <activity
+            android:name=".AddStudentActivity"
+            android:parentActivityName=".MainActivity"
+            android:exported="false" />
+        <!-- parentActivityName giúp hiển thị nút Back (<) trên thanh tiêu đề -->
+
+        <!-- 3. Màn hình Chi tiết & Sửa sinh viên -->
+        <activity
+            android:name=".StudentDetailActivity"
+            android:parentActivityName=".MainActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

@@ -1,7 +1,9 @@
 package com.example.studentmanager
 
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -10,111 +12,45 @@ import com.example.studentmanager.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var studentAdapter: StudentAdapter
-
-    private val studentList = mutableListOf<Student>()
-
-    private var selectedPosition: Int = -1
+    private lateinit var adapter: StudentAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         setupRecyclerView()
-        binding.btnAdd.setOnClickListener {
-            addStudent()
-        }
+    }
 
-        binding.btnUpdate.setOnClickListener {
-            updateStudent()
-        }
+    override fun onResume() {
+        super.onResume()
+        adapter.notifyDataSetChanged()
     }
 
     private fun setupRecyclerView() {
-        studentAdapter = StudentAdapter(
-            studentList,
-            onEditClick = { student ->
-                binding.etMSSV.setText(student.mssv)
-                binding.etHoTen.setText(student.hoTen)
-                selectedPosition = studentList.indexOf(student)
-                binding.btnUpdate.isEnabled = true
-            },
-            onDeleteClick = { student ->
-                deleteStudent(student)
-            }
-        )
-
-        binding.recyclerView.adapter = studentAdapter
+        adapter = StudentAdapter(StudentRepository.getStudents()) { student ->
+            val intent = Intent(this, StudentDetailActivity::class.java)
+            intent.putExtra("MSSV", student.mssv) // Truyền khóa chính (MSSV) sang
+            startActivity(intent)
+        }
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = adapter
     }
 
-    private fun addStudent() {
-        val mssv = binding.etMSSV.text.toString().trim()
-        val hoTen = binding.etHoTen.text.toString().trim()
-
-        if (mssv.isEmpty() || hoTen.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        if (studentList.any { it.mssv == mssv }) {
-            Toast.makeText(this, "MSSV đã tồn tại!", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val newStudent = Student(mssv, hoTen)
-        studentList.add(newStudent)
-
-        studentAdapter.notifyItemInserted(studentList.size - 1)
-
-        clearInput()
+    // Tạo Option Menu
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
     }
 
-    private fun updateStudent() {
-        if (selectedPosition == -1) {
-            Toast.makeText(this, "Chưa chọn sinh viên để sửa", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val mssv = binding.etMSSV.text.toString().trim()
-        val hoTen = binding.etHoTen.text.toString().trim()
-
-        if (mssv.isEmpty() || hoTen.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val student = studentList[selectedPosition]
-        student.mssv = mssv
-        student.hoTen = hoTen
-
-        studentAdapter.notifyItemChanged(selectedPosition)
-
-        Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
-
-        clearInput()
-        selectedPosition = -1
-        binding.btnUpdate.isEnabled = false
-    }
-
-    private fun deleteStudent(student: Student) {
-        val position = studentList.indexOf(student)
-        if (position != -1) {
-            studentList.removeAt(position)
-            studentAdapter.notifyItemRemoved(position)
-            if (position == selectedPosition) {
-                clearInput()
-                selectedPosition = -1
-                binding.btnUpdate.isEnabled = false
-            } else if (position < selectedPosition) {
-                selectedPosition--
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_add -> {
+                // Mở Activity Thêm
+                val intent = Intent(this, AddStudentActivity::class.java)
+                startActivity(intent)
+                true
             }
+            else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun clearInput() {
-        binding.etMSSV.text.clear()
-        binding.etHoTen.text.clear()
-        binding.etMSSV.requestFocus()
     }
 }

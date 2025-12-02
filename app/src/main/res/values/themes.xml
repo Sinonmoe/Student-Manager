@@ -1,8 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.StudentManager" parent="Theme.Material3.DayNight.NoActionBar">
+    <!--
+       LỖI: Theme cũ là "...DayNight.NoActionBar" làm mất thanh menu.
+       SỬA: Đổi thành "...DayNight" (Xóa chữ .NoActionBar) để hiện thanh tiêu đề.
+    -->
+    <style name="Base.Theme.StudentManager" parent="Theme.Material3.DayNight">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
     <style name="Theme.StudentManager" parent="Base.Theme.StudentManager" />
